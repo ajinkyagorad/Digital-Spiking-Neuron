@@ -1,11 +1,10 @@
-
-package myEntities is
-
-
--- N Bit generic register--
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
 library ieee_proposed;
+
+--use model:
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
 use ieee_proposed.fixed_pkg.all;
 use work.all;
 entity register_n is 
@@ -13,9 +12,8 @@ generic(bits:natural:=4);
 port(clk: in std_logic;
 rst: in std_logic;
 dataIn : in std_logic_vector(bits-1 downto 0);
-dataOut : out std_logic_vector(bits-1 downto 0);
+dataOut : out std_logic_vector(bits-1 downto 0));
 end entity register_n;
-
 
 architecture behav of register_n is 
 begin
@@ -23,7 +21,7 @@ begin
 	begin
 
 	if rst= '1' then
-		dataOut<='0';
+		dataOut<= (others=>'0');
 	elsif clk'event and clk='1' then
 		dataOut<=dataIn;
 	end if;
@@ -31,22 +29,29 @@ begin
 	end process;
 end behav;
 
+--
 
--- Threshold Comparator : Neuron Component--
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
 library ieee_proposed;
+
+--use model:
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
 use ieee_proposed.fixed_pkg.all;
 use work.all;
+use work.myTypes.all;
+
 entity VthComparator is
 generic(bits: natural:=8);
 port( V,Vth : in fp;
 	spike: out std_logic);
-end VthComparator
+end VthComparator;
 
 architecture behav of VthComparator is
 begin
 process(V)
+begin
 if V>Vth then
 spike<='1';
 else
@@ -55,23 +60,30 @@ end if;
 end process;
 end behav;
 
+--
 
 -- Delay FF : Synapse Component --
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+library ieee;
 library ieee_proposed;
+
+--use model:
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
 use ieee_proposed.fixed_pkg.all;
 use work.all;
-entity DFF is
+use work.myTypes.all;
+
+entity DelayFF is
 port(spike_in,clk : in std_logic;
 		spike_out : out std_logic);
-end entity DFF;
-architecture behav of DFF is
+end entity DelayFF;
+architecture behav of DelayFF is
 begin
 process(clk)
+begin
 if clk'event and clk='1' then
 	spike_out<=spike_in;
 end if;
 end process;
 end behav;
-		
