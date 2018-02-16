@@ -30,7 +30,7 @@ rst: in std_logic;
 dataIn : in std_logic_vector(bits-1 downto 0);
 dataOut : out std_logic_vector(bits-1 downto 0));
 end component;
---component STDP is
+--component STDP  is
 --port(spikeSynapse, spikeNeuron : in std_logic;
 --		w: out fp);
 --end;
