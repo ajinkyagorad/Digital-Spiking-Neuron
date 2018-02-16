@@ -14,11 +14,11 @@ end testbench;
 
 architecture test of testbench is
 
-	component wrapper_adder is
+	component wrapper_adder_fix_pt is
 	 	port(inp : in std_add_array(1 to 2);
         	 result : out std_logic_vector(8 downto 0)
 			);
-	end component wrapper_adder ;
+	end component wrapper_adder_fix_pt ;
 
 
 	signal w: std_add_array(1 to 2);
@@ -27,7 +27,7 @@ architecture test of testbench is
 	
 begin
 	
-	dut: wrapper_adder port map(inp=>w,result=>z);
+	dut: wrapper_adder_fix_pt port map(inp=>w,result=>z);
 	w(1)<=x;
 	w(2)<=y;
 	
