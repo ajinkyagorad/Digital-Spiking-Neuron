@@ -4,8 +4,6 @@
 library ieee;
 library ieee_proposed;
 
-
-
 --use model:
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -42,7 +40,7 @@ signal v1,v2,av1,av2,v1n,v2n,W : fp;
 constant alpha1 : fp:=to_sfixed(0.9,fp_int,fp_frac);
 constant alpha2 : fp:=to_sfixed(0.8,fp_int,fp_frac);
 signal spikeArrivedSLV : std_logic_vector(0 downto 0);
-signal v1nSLV, v1SLV, v2nSLV, v2SLV: std_logic_vector(fp_int downto fp_frac);
+signal v1nSLV, v1SLV, v2nSLV, v2SLV: std_logic_vector(fp_bits-1 downto 0);
 begin
 
 	D0 : DelayFF port map(clk=>clk,spike_in=>spikeSynapse,spike_out=>spikeArrived(1));
@@ -50,10 +48,10 @@ begin
 	D : DelayFF port map(clk=>clk,spike_in=>spikeArrived(i-1),spike_out=>spikeArrived(i));
 	end generate DFF_genloop;
 	spikeArrivedSLV(0) <= spikeArrived(delay); 
-	v1n<=to_sfixed(to_integer(unsigned(spikeArrivedSLV)),fp_int,fp_frac)+aV1;
-	v2n<=to_sfixed(to_integer(unsigned(spikeArrivedSLV)),fp_int,fp_frac)+aV2;
-	av1<=alpha1*v1;
-	av2<=alpha2*v2;
+	v1n<=resize(to_sfixed(to_integer(unsigned(spikeArrivedSLV)),fp_int,fp_frac)+aV1, fp_int, fp_frac);
+	v2n<=resize(to_sfixed(to_integer(unsigned(spikeArrivedSLV)),fp_int,fp_frac)+aV2, fp_int, fp_frac);
+	av1<=resize(alpha1*v1, fp_int, fp_frac);
+	av2<=resize(alpha2*v2, fp_int, fp_frac);
 	
 	v1nSLV <= to_slv(v1n);
 	v2nSLV <= to_slv(v2n);
@@ -63,5 +61,5 @@ begin
 	v2Reg : register_n  generic map(bits=>fp_bits) port map(clk=>clk,dataIn=>v2nSLV,dataOut=>v2SLV,rst=>'0');
 	--STDP1 : STDP port map(clk=>clk,spikeSynapse=>spikeSynapse,spikeNeuron=>spikeNeuron,W=>W);
 	
-	PSPout<= (v1-v2)*W;
+	PSPout<= resize((v1-v2)*W, fp_int, fp_frac);
 end behav;
