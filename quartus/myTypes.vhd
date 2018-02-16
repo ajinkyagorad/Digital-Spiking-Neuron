@@ -1,3 +1,9 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+library ieee_proposed;
+use ieee_proposed.fixed_pkg.all;
+use work.all;
+
 package myTypes is
 constant fp_int : natural :=4;
 constant fp_frac : natural := -3;
