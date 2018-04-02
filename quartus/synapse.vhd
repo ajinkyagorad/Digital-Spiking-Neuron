@@ -66,7 +66,7 @@ end behav;
 
 ----wrapper---
 
--- stdp wrapper
+-- synapse wrapper
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
@@ -79,24 +79,27 @@ library work;
 use work.myTypes.all;
 use work.all;
 
-entity wrapper_stdp is
-port(spikeSynapse, spikeNeuron,clk : in std_logic;
-		w: out std_logic_vector(7 downto 0));
-end entity wrapper_stdp;
+entity wrapper_synapse is
+		generic(delay : natural :=10);
+		port(spikeSynapse,spikeNeuron,clk : in std_logic;
+		PSPout : out std_logic_vector(7 downto 0));
+	end entity wrapper_synapse;
 
-architecture behave of wrapper_stdp is 
+architecture behave of wrapper_synapse is 
 
-	component STDP is
-	port(spikeSynapse, spikeNeuron,clk : in std_logic;
-		w: out fp);
-	end component;
+	component synapse is
+		generic(delay : natural :=10);
+		port(spikeSynapse,spikeNeuron,clk : in std_logic;
+		PSPout : out fp);
+	end component synapse;
+
 
 	--signal PSPout_fp: sfixed(4 downto -3):=(others => '0');
-	signal w_fp: fp:=(others => '0');
+	signal PSPout_fp: fp:=(others => '0');
 	
 begin
 	
-	stdp_instance: stdp port map(spikeSynapse=>spikeSynapse, spikeNeuron=>spikeNeuron, clk=>clk, w=>w_fp);
-	w <= to_slv(w_fp);
+	synapse_instance: synapse port map(spikeSynapse, spikeNeuron, clk, PSPout_fp);
+	PSPout <= to_slv(PSPout_fp);
 
 end behave;
