@@ -30,20 +30,17 @@ architecture Behave of neuron is
 	 component VthComparator is
 		generic(bits: natural:=8);
 		port( V,Vth : in fp;
-			spike: out std_logic);
+				spike: out std_logic);
 	 end component;
 
 	 signal spik : std_logic;
-    signal Vn,aVn,Iapp_b1,Isyn_b1,sum_I,Vn1 : fp;
+	 signal Vn,Vn1 : fp;
     signal b1,b2,alpha : fp := to_sfixed(1.0,4,-3);
     signal Vth : fp := to_sfixed(1.0,4,-3);
 	
     begin 
-		--b1 <= to_sfixed(1.0,fp_int,fp_frac);
-		--alpha <= to_sfixed(1.0,fp_int,fp_frac);
-		--b2 <= to_sfixed(1.0,fp_int,fp_frac);
 		regV : register_fp generic map(bits=>fp_bits) port map (clk=>clk,rst=>spik,dataIn=>Vn1,dataOut=>Vn);
-		compV : VthComparator port map(V=>Vn1,Vth=>Vth,spike=>spik);
+		compV : VthComparator port map(V=>Vn,Vth=>Vth,spike=>spik);
 		Vn1 <= resize(Iapp*b1 + Isyn*b2 + alpha*Vn,fp_int,fp_frac);
 		spike <= spik;
 
@@ -76,16 +73,14 @@ architecture behave of wrapper_neuron is
 		Iapp,Isyn : in fp;
 		clk : in std_logic;
 		spike: out std_logic);
-	end neuron;
+	end component;
 
-
-	--signal PSPout_fp: sfixed(4 downto -3):=(others => '0');
 	signal Iapp_fp, Isyn_fp: fp:=(others => '0');
 	
 begin
 	Iapp_fp <= to_sfixed(Iapp, fp_int, fp_frac);
 	Isyn_fp <= to_sfixed(Isyn, fp_int, fp_frac);
-	neuron_instance: neuron port map(Iapp_fp, Isyn_fp, spikeNeuron, clk, PSPout_fp);
+	neuron_instance: neuron port map(Iapp_fp, Isyn_fp, clk, spike);
 
 end behave;
 
