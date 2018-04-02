@@ -65,20 +65,20 @@ architecture behav of STDP is
 			dataOut : out fp);
 	end component;
 
-	signal v3,v3n,av3,v4,v4n,av4,avn3,avn4,deltaW,Wn,Wsig : fp:=(others=>'0');
+	signal v3,v3n,av3,v4,v4n,av4,avn3,avn4,deltaW,Wn,Wsig : fp:=to_sfixed(0,fp_int,fp_frac);
 	signal spikeSynapseSLV: std_logic_vector(0 downto 0);
 	signal spikeNeuronSLV : std_logic_vector(0 downto 0);
-	signal alpha1 : fp ;--:=to_sfixed(1,alpha1);
-	signal alpha2 : fp ;--:=to_sfixed(-1,fp_int,fp_frac);
-	signal alpha3 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
-	signal alpha4 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
+	signal alpha1 : fp :=to_sfixed(1,fp_int,fp_frac);
+	signal alpha2 : fp :=to_sfixed(-1,fp_int,fp_frac);
+	signal alpha3 : fp :=to_sfixed(0.9,fp_int,fp_frac);
+	signal alpha4 : fp :=to_sfixed(0.9,fp_int,fp_frac);
 
 begin 
 
 	alpha1<= to_sfixed(1,alpha1);
 	alpha2<= to_sfixed(-1,alpha2);
-	alpha3<= to_sfixed(0.9, alpha3);
-	alpha4<= to_sfixed(0.9, alpha4);
+	alpha3<= to_sfixed(0.7, alpha3);
+	alpha4<= to_sfixed(0.7, alpha4);
 	spikeSynapseSLV(0)<=spikeSynapse;
 	spikeNeuronSLV(0)<= spikeNeuron;
 	v3n<=resize(resize(v3*alpha3,fp_int,fp_frac)+to_sfixed(to_integer(unsigned(spikeSynapseSLV)),fp_int,fp_frac),fp_int,fp_frac);
@@ -91,5 +91,5 @@ begin
 	Wn <=resize(Wsig+deltaW,fp_int,fp_frac);
 
 	WReg : register_fp  port map(clk=>clk,dataIn=>Wn,dataOut=>Wsig,rst=>'0');
-	
+
 end behav;
