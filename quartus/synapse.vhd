@@ -63,3 +63,40 @@ begin
 	
 	PSPout<= resize((v1-v2)*W, fp_int, fp_frac);
 end behav;
+
+----wrapper---
+
+-- stdp wrapper
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
+
+library ieee_proposed;
+use ieee_proposed.fixed_pkg.all;
+use ieee_proposed.math_utility_pkg.all;
+
+library work;
+use work.myTypes.all;
+use work.all;
+
+entity wrapper_stdp is
+port(spikeSynapse, spikeNeuron,clk : in std_logic;
+		w: out std_logic_vector(7 downto 0));
+end entity wrapper_stdp;
+
+architecture behave of wrapper_stdp is 
+
+	component STDP is
+	port(spikeSynapse, spikeNeuron,clk : in std_logic;
+		w: out fp);
+	end component;
+
+	--signal PSPout_fp: sfixed(4 downto -3):=(others => '0');
+	signal w_fp: fp:=(others => '0');
+	
+begin
+	
+	stdp_instance: stdp port map(spikeSynapse=>spikeSynapse, spikeNeuron=>spikeNeuron, clk=>clk, w=>w_fp);
+	w <= to_slv(w_fp);
+
+end behave;
