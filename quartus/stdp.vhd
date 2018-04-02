@@ -36,7 +36,6 @@ end behave;
 -- STDP component
 library ieee;
 library ieee_proposed;
-
 --use model:
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -51,23 +50,31 @@ port(spikeSynapse, spikeNeuron,clk : in std_logic;
 end entity STDP;
 
 architecture behav of STDP is
-component register_n is 
-generic(bits:natural:=4);
-port(clk: in std_logic;
-rst: in std_logic;
-dataIn : in std_logic_vector(bits-1 downto 0);
-dataOut : out std_logic_vector(bits-1 downto 0));
-end component;
 
-signal v3,v3n,av3,v4,v4n,av4,avn3,avn4,deltaW,Wn,Wsig : fp:=(others=>'0');
-signal spikeSynapseSLV: std_logic_vector(0 downto 0);
-signal spikeNeuronSLV : std_logic_vector(0 downto 0);
-signal v3slv,v3nslv,v4slv,v4nslv,wnslv,WsigSLV : std_logic_vector(fp_bits-1 downto 0);
-signal alpha1 : fp ;--:=to_sfixed(1,alpha1);
-signal alpha2 : fp ;--:=to_sfixed(-1,fp_int,fp_frac);
-signal alpha3 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
-signal alpha4 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
+	component register_fp is 
+		port(clk: in std_logic;
+			rst: in std_logic;
+			dataIn : in fp;
+			dataOut : out fp);
+	end component;
+
+	component register_fp_rst_1 is 
+		port(clk: in std_logic;
+			rst: in std_logic;
+			dataIn : in fp;
+			dataOut : out fp);
+	end component;
+
+	signal v3,v3n,av3,v4,v4n,av4,avn3,avn4,deltaW,Wn,Wsig : fp:=(others=>'0');
+	signal spikeSynapseSLV: std_logic_vector(0 downto 0);
+	signal spikeNeuronSLV : std_logic_vector(0 downto 0);
+	signal alpha1 : fp ;--:=to_sfixed(1,alpha1);
+	signal alpha2 : fp ;--:=to_sfixed(-1,fp_int,fp_frac);
+	signal alpha3 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
+	signal alpha4 : fp ;--:=to_sfixed(0.9,fp_int,fp_frac);
+
 begin 
+
 	alpha1<= to_sfixed(1,alpha1);
 	alpha2<= to_sfixed(-1,alpha2);
 	alpha3<= to_sfixed(0.9, alpha3);
@@ -76,17 +83,13 @@ begin
 	spikeNeuronSLV(0)<= spikeNeuron;
 	v3n<=resize(resize(v3*alpha3,fp_int,fp_frac)+to_sfixed(to_integer(unsigned(spikeSynapseSLV)),fp_int,fp_frac),fp_int,fp_frac);
 	v4n<=resize(resize(v4*alpha4,fp_int,fp_frac)+to_sfixed(to_integer(unsigned(spikeNeuronSLV)),fp_int,fp_frac),fp_int,fp_frac);
-	v3nslv<=to_slv(v3n);
-	v3slv<=to_slv(v3);
-	v4nslv<=to_slv(v4n);
-	v4slv<=to_slv(v4);
-	v3Reg : register_n  generic map(bits=>fp_bits) port map(clk=>clk,dataIn=>v3nslv,dataOut=>v3slv,rst=>spikeSynapse);
-	v4Reg : register_n  generic map(bits=>fp_bits) port map(clk=>clk,dataIn=>v4nslv,dataOut=>v4slv,rst=>spikeNeuron);
+	
+	v3Reg : register_fp_rst_1  port map(clk=>clk,dataIn=>v3n,dataOut=>v3,rst=>spikeSynapse);
+	v4Reg : register_fp_rst_1  port map(clk=>clk,dataIn=>v4n,dataOut=>v4,rst=>spikeNeuron);
 	W<=Wsig;
 	deltaW<=resize(alpha1*v3+alpha2*v4,fp_int,fp_frac);
 	Wn <=resize(Wsig+deltaW,fp_int,fp_frac);
-	WnSLV<=to_slv(Wn);
-	WsigSLV<=to_slv(Wsig);
-	WReg : register_n  generic map(bits=>fp_bits) port map(clk=>clk,dataIn=>WnSLV,dataOut=>WsigSLV,rst=>'0');
+
+	WReg : register_fp  port map(clk=>clk,dataIn=>Wn,dataOut=>Wsig,rst=>'0');
 	
 end behav;
