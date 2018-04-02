@@ -36,7 +36,7 @@ architecture Behave of neuron is
 	 signal spik : std_logic;
 	 signal Vn,Vn1 : fp;
     signal b1,b2,alpha : fp := to_sfixed(1.0,4,-3);
-    signal Vth : fp := to_sfixed(1.0,4,-3);
+    signal Vth : fp := to_sfixed(3.0,4,-3);
 	
     begin 
 		regV : register_fp generic map(bits=>fp_bits) port map (clk=>clk,rst=>spik,dataIn=>Vn1,dataOut=>Vn);
@@ -49,7 +49,7 @@ end Behave;
 -- synapse wrapper
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use ieee.numeric_std.all;
+use ieee.numeric_std.all;	
 
 library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
