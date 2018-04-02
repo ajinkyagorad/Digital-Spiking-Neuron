@@ -6,6 +6,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee_proposed.math_utility_pkg.all;
 use ieee_proposed.fixed_pkg.all;
+library work;
 use work.myTypes.all;
 
 entity neuron is
@@ -34,7 +35,7 @@ architecture Behave of neuron is
 	 end component;
 
 	 signal spik : std_logic;
-	 signal Vn,Vn1 : fp;
+	 signal Vn,Vn1 : fp := to_sfixed(0.0,4,-3);
     signal b1,b2,alpha : fp := to_sfixed(1.0,4,-3);
     signal Vth : fp := to_sfixed(3.0,4,-3);
 	
@@ -49,7 +50,7 @@ end Behave;
 -- synapse wrapper
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use ieee.numeric_std.all;	
+use ieee.numeric_std.all;
 
 library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;

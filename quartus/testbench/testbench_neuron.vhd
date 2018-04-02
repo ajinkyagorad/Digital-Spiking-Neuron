@@ -23,7 +23,7 @@ architecture test of testbench is
 	component;
 	
 	signal clk: std_logic := '0';
-	signal Iap : std_logic_vector := "00000000";
+	signal Iap : std_logic_vector(7 downto 0) := "00000000";
 	signal result: std_logic;	
 
 begin
