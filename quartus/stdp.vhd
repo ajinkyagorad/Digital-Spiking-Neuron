@@ -1,36 +1,38 @@
--- Register Entity Verified for syntax
-library ieee;
-library ieee_proposed;
-
---use model:
-use ieee.std_logic_1164.all;
+-- stdp wrapper
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std.all;
-use ieee_proposed.math_utility_pkg.all;
+
+library ieee_proposed;
 use ieee_proposed.fixed_pkg.all;
+use ieee_proposed.math_utility_pkg.all;
+
+library work;
 use work.myTypes.all;
 use work.all;
-entity register_n is 
-generic(bits:natural:=4);
-port(clk: in std_logic;
-rst: in std_logic;
-dataIn : in std_logic_vector(bits-1 downto 0);
-dataOut : out std_logic_vector(bits-1 downto 0));
-end entity register_n;
 
-architecture behav of register_n is 
+entity wrapper_stdp is
+port(spikeSynapse, spikeNeuron,clk : in std_logic;
+		w: out std_logic_vector(7 downto 0));
+end entity wrapper_stdp;
+
+architecture behave of wrapper_stdp is 
+
+	component STDP is
+	port(spikeSynapse, spikeNeuron,clk : in std_logic;
+		w: out fp);
+	end component;
+
+	--signal PSPout_fp: sfixed(4 downto -3):=(others => '0');
+	signal w_fp: fp:=(others => '0');
+	
 begin
-    process(clk,rst)
-    begin
+	
+	stdp_instance: stdp port map(spikeSynapse=>spikeSynapse, spikeNeuron=>spikeNeuron, clk=>clk, w=>w_fp);
+	w <= to_slv(w_fp);
 
-    if rst= '1' then
-        dataOut<= (others=>'0');
-    elsif clk'event and clk='1' then
-        dataOut<=dataIn;
-    end if;
-        
-    end process;
-end behav;
-
+end behave;
+ 	
 -- STDP component
 library ieee;
 library ieee_proposed;
