@@ -19,16 +19,16 @@ architecture test of testbench is
 	 	port (Iapp,Isyn : in std_logic_vector (7 downto 0);
 			  clk : in std_logic;
 			  spike: out std_logic);
-	end component;
+	end 
+	component;
 	
-	signal clk, Iap : std_logic := '0';
-	signal result: std_logic_vector(7 downto 0);	
+	signal clk: std_logic := '0';
+	signal Iap : std_logic_vector := "00000000";
+	signal result: std_logic;	
 
 begin
 	
 	clk <= (not clk) after 10 ns;
-
-	dut: wrapper_neuron port map(Iapp=>Iap, Isyn=>'0', clk=>clk, spike=> result);
 
 	process
 
@@ -60,5 +60,7 @@ begin
 		wait; -- end simulation
 	
 	end process;
+
+	dut: wrapper_neuron port map(Iapp=>Iap, Isyn=>"00000000", clk=>clk, spike=> result);
 	
 end test;
