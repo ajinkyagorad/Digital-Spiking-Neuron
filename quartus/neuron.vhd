@@ -19,7 +19,6 @@ end entity;
 architecture Behave of neuron is
 
    component register_fp
-    generic(bits :natural :=4);
     port(
          clk : in std_logic;
 			rst : in std_logic;
@@ -29,20 +28,19 @@ architecture Behave of neuron is
     end component;
 	 
 	 component VthComparator is
-		generic(bits: natural:=8);
 		port( V,Vth : in fp;
 				clk : in std_logic;
 				spike: out std_logic);
 	 end component;
 
 	 signal spik : std_logic;
-	 signal Vn,Vn1 : fp := to_sfixed(0.0,4,-3);
-    signal b1,b2 : fp := to_sfixed(1.0,4,-3);
-	 signal alpha : fp := to_sfixed(0.8,4,-3);
-    signal Vth : fp := to_sfixed(3.0,4,-3);
+	 signal Vn,Vn1 : fp := to_sfixed(0.0,fp_int,fp_frac);
+    signal b1,b2 : fp := to_sfixed(1.0,fp_int,fp_frac);
+	 signal alpha : fp := to_sfixed(0.8,fp_int,fp_frac);
+    signal Vth : fp := to_sfixed(3.0,fp_int,fp_frac);
 	
     begin 
-		regV : register_fp generic map(bits=>fp_bits) port map (clk=>clk,rst=>spik,dataIn=>Vn1,dataOut=>Vn);
+		regV : register_fp port map (clk=>clk,rst=>spik,dataIn=>Vn1,dataOut=>Vn);
 		compV : VthComparator port map(V=>Vn,Vth=>Vth,clk=>clk,spike=>spik);
 		Vn1 <= resize(Iapp*b1 + Isyn*b2 + alpha*Vn,fp_int,fp_frac);
 		spike <= spik;
@@ -64,7 +62,7 @@ use work.all;
 
 entity wrapper_neuron is
     port (
-	Iapp,Isyn : in std_logic_vector (7 downto 0);
+	Iapp,Isyn : in std_logic_vector (fp_bits-1 downto 0);
 	clk : in std_logic;
 	spike: out std_logic);
 end entity;
@@ -86,4 +84,3 @@ begin
 	neuron_instance: neuron port map(Iapp_fp, Isyn_fp, clk, spike);
 
 end behave;
-
