@@ -59,24 +59,23 @@ component DelayFF is
 port(spike_in,clk : in std_logic;
 		spike_out : out std_logic);
 end component;
-component register_n is 
-generic(bits:natural:=4);
-port(clk: in std_logic;
-rst: in std_logic;
-dataIn : in std_logic_vector(bits-1 downto 0);
-dataOut : out std_logic_vector(bits-1 downto 0));
-end component;
+component register_fp is 
+	port(clk: in std_logic;
+		rst: in std_logic;
+		dataIn : in fp;
+		dataOut : out fp);
+	end component;
 component STDP is
 port(spikeSynapse, spikeNeuron, clk : in std_logic;
 		w: out fp);
 end component;
 
 signal spikeArrived : std_logic_vector(delay downto 1);
-signal v1,v2,av1,av2,v1n,v2n,W : fp := to_sfixed(0,fp_int,fp_frac); 
+signal v1,v2,av1,av2,v1n,v2n,W, saint1, saint2 : fp := to_sfixed(0,fp_int,fp_frac); 
 constant alpha1 : fp:=to_sfixed(0.9,fp_int,fp_frac);
 constant alpha2 : fp:=to_sfixed(0.8,fp_int,fp_frac);
 signal spikeArrivedSLV : std_logic_vector(0 downto 0);
-signal v1nSLV, v1SLV, v2nSLV, v2SLV: std_logic_vector(fp_bits-1 downto 0);
+signal saint:integer := 0;
 begin
 
 	D0 : DelayFF port map(clk=>clk,spike_in=>spikeSynapse,spike_out=>spikeArrived(1));
@@ -89,13 +88,12 @@ begin
 	av1<=resize(alpha1*v1, fp_int, fp_frac);
 	av2<=resize(alpha2*v2, fp_int, fp_frac);
 	
-	v1nSLV <= to_slv(v1n);
-
-	v2nSLV <= to_slv(v2n);
-	v1 <= to_sfixed(v1SLV,v1);
-   v2 <= to_sfixed(v2SLV,v2);
-	v1Reg : register_n  generic map(bits=>fp_bits) port map (clk=>clk,dataIn=>v1nSLV,dataOut=>v1SLV,rst=>'0');
-	v2Reg : register_n  generic map(bits=>fp_bits) port map(clk=>clk,dataIn=>v2nSLV,dataOut=>v2SLV,rst=>'0');
+--	saint <= to_integer(unsigned(spikeArrivedSLV));
+--	saint1 <= to_sfixed(saint, fp_int, fp_frac) + av1;
+--	saint2 <= to_sfixed(saint, fp_int, fp_frac) + av2;
+	
+	v1Reg : register_fp   port map (clk=>clk,dataIn=>v1n,dataOut=>v1,rst=>'0');
+	v2Reg : register_fp  port map(clk=>clk,dataIn=>v2n,dataOut=>v2,rst=>'0');
 	STDP1 : STDP port map(clk=>clk,spikeSynapse=>spikeSynapse,spikeNeuron=>spikeNeuron,W=>W);
 	
 	PSPout<= resize((v1-v2)*W, fp_int, fp_frac);
