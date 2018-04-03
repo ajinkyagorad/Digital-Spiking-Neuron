@@ -31,20 +31,22 @@ architecture Behave of neuron is
 	 component VthComparator is
 		generic(bits: natural:=8);
 		port( V,Vth : in fp;
+				clk : in std_logic;
 				spike: out std_logic);
 	 end component;
 
 	 signal spik : std_logic;
 	 signal Vn,Vn1 : fp := to_sfixed(0.0,4,-3);
-    signal b1,b2,alpha : fp := to_sfixed(1.0,4,-3);
+    signal b1,b2 : fp := to_sfixed(1.0,4,-3);
+	 signal alpha : fp := to_sfixed(0.8,4,-3);
     signal Vth : fp := to_sfixed(3.0,4,-3);
 	
     begin 
 		regV : register_fp generic map(bits=>fp_bits) port map (clk=>clk,rst=>spik,dataIn=>Vn1,dataOut=>Vn);
-		compV : VthComparator port map(V=>Vn,Vth=>Vth,spike=>spik);
+		compV : VthComparator port map(V=>Vn,Vth=>Vth,clk=>clk,spike=>spik);
 		Vn1 <= resize(Iapp*b1 + Isyn*b2 + alpha*Vn,fp_int,fp_frac);
 		spike <= spik;
-
+		
 end Behave;
 
 -- synapse wrapper

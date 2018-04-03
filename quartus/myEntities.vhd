@@ -79,18 +79,21 @@ use work.myTypes.all;
 entity VthComparator is
 generic(bits: natural:=8);
 port( V,Vth : in fp;
-	spike: out std_logic);
+		clk : in std_logic;
+		spike: out std_logic);
 end VthComparator;
 
 architecture behav of VthComparator is
 begin
-process(V)
+process(V, clk)
 begin
-if V>Vth then
-spike<='1';
-else
-spike<='0';
-end if;
+	if (clk'event and (clk='1')) then
+		if (V>=Vth) then
+			spike<='1';
+		else
+			spike<='0';
+		end if;
+	end if;
 end process;
 end behav;
 
