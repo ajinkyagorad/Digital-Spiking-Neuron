@@ -90,5 +90,8 @@ w3_2 <= to_sfixed(-1.0, fp_int, fp_frac);
 w4_1 <= to_sfixed(-1.0, fp_int, fp_frac);
 w4_2 <= to_sfixed(1.0, fp_int, fp_frac);
 
-
+--Iapp1 <= to_sfixed(1.0, fp_int, fp_frac);
+--Iapp2 <= to_sfixed(1.0, fp_int, fp_frac);
+--Iapp3 <= to_sfixed(0.0, fp_int, fp_frac);
+--Iapp4 <= to_sfixed(0.0, fp_int, fp_frac);
 end behave;
