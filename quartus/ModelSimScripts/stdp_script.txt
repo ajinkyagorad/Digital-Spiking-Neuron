@@ -1,0 +1,60 @@
+add wave -position end  sim:/stdp/clk
+add wave -position end  sim:/stdp/spikeSynapse
+add wave -position end  sim:/stdp/spikeNeuron
+add wave -position end  sim:/stdp/initW
+add wave -position end  sim:/stdp/w
+add wave -position end  sim:/stdp/w0
+add wave -position end  sim:/stdp/v4n
+add wave -position end  sim:/stdp/v4
+add wave -position end  sim:/stdp/v3n
+add wave -position end  sim:/stdp/v3
+add wave -position end  sim:/stdp/ensig
+add wave -position end  sim:/stdp/deltaW
+add wave -position end  sim:/stdp/avn4
+add wave -position end  sim:/stdp/avn3
+add wave -position end  sim:/stdp/av4
+add wave -position end  sim:/stdp/av3
+add wave -position end  sim:/stdp/alpha4
+add wave -position end  sim:/stdp/alpha3
+add wave -position end  sim:/stdp/alpha2
+add wave -position end  sim:/stdp/alpha1
+add wave -position end  sim:/stdp/Wsig
+add wave -position end  sim:/stdp/Wn
+force -freeze sim:/stdp/clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/stdp/w0 000001000000000 0
+force -freeze sim:/stdp/spikeSynapse 0 0
+force -freeze sim:/stdp/spikeNeuron 0 0
+force -freeze sim:/stdp/initW 0 0
+run
+force -freeze sim:/stdp/initW 1 0
+run
+force -freeze sim:/stdp/initW 0 0
+run
+run
+run
+run
+force -freeze sim:/stdp/spikeSynapse 1 0
+run
+force -freeze sim:/stdp/spikeSynapse 0 0
+run
+run
+
+run
+run
+run
+force -freeze sim:/stdp/spikeNeuron 1 0
+run
+force -freeze sim:/stdp/spikeNeuron 0 0
+run
+run
+run
+run
+run
+force -freeze sim:/stdp/spikeSynapse 1 0
+run
+force -freeze sim:/stdp/spikeSynapse 0 0
+run
+run
+run
+run
+run
