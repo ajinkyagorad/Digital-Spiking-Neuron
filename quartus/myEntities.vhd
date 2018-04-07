@@ -1,4 +1,5 @@
 
+--
 library ieee;
 library ieee_proposed;
 
@@ -23,12 +24,14 @@ begin
 	process(clk,rst)
 	begin
 	
-	if rst= '1' then
-		dataOutsig <= to_sfixed(1.0,dataOutsig);
-	elsif clk'event and clk='1' then
-		dataOutsig <= dataIn;
+	
+	if clk'event and clk='1' then
+		if rst= '1' then
+		dataOut <= to_sfixed(1.0,fp_int,fp_frac);
+		else
+		dataOut <= dataIn;
+		end if;
 	end if;
-		dataOut<=dataOutsig;
 	end process;
 end behav;
 --
@@ -158,3 +161,38 @@ begin
 		
 	end process;
 end behav;
+
+-- THESE ARE DEBUG ENTITIES
+
+library ieee;
+library ieee_proposed;
+
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
+use ieee_proposed.fixed_pkg.all;
+use work.all;
+use work.myTypes.all;
+
+entity decayBlock is 
+port (spike,clk : in std_logic;
+			v: out fp);
+end entity;
+architecture arch of decayBlock is 
+
+	component register_fp_rst_1 is 
+	port(clk: in std_logic;
+		rst: in std_logic;
+		dataIn : in fp;
+		dataOut : out fp);
+	end component;
+	signal spikeSLV: std_logic_vector(0 downto 0);
+	signal vsig,vn: fp:=to_sfixed(0,fp_int,fp_frac);
+	signal alpha : fp :=to_sfixed(0.8,fp_int,fp_frac);
+begin
+		alpha<= to_sfixed(0.8,alpha);
+		spikeSLV(0)<=spike;
+		vn<=resize(resize(vsig*alpha,fp_int,fp_frac)+to_sfixed(to_integer(unsigned(spikeSLV)),fp_int,fp_frac),fp_int,fp_frac);
+		vReg : register_fp_rst_1 port map(clk=>clk,dataIn=>vn,dataOut=>vsig,rst=>spike);
+		v<=vn;
+end arch;
