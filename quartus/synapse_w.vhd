@@ -12,7 +12,7 @@ use work.myTypes.all;
 
 entity synapse_w is
 generic(delay : natural :=10);
-port(spikeSynapse,spikeNeuron,clk : in std_logic;
+port(spikeSynapse,clk : in std_logic;
 		W: in fp;
 		PSPout : out fp);
 end entity synapse_w;
@@ -28,10 +28,7 @@ component register_fp is
 		dataIn : in fp;
 		dataOut : out fp);
 	end component;
-component STDP is
-port(spikeSynapse, spikeNeuron, clk : in std_logic;
-		w: out fp);
-end component;
+
 
 signal spikeArrived : std_logic_vector(delay downto 1);
 signal v1,v2,av1,av2,v1n,v2n, saint1, saint2 : fp := to_sfixed(0,fp_int,fp_frac); 
