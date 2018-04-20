@@ -103,5 +103,6 @@ begin
 	Soma: neuron port map (Iapp => Iapp, spike => outputSpikeSig, clk => clk, Isyn => IsynSig);
 	
 	IsynSig <= resize (PSPoutSig(0)+PSPoutSig(1)+PSPoutSig(2)+PSPoutSig(3)+PSPoutSig(4),IsynSig);
+	outputSpike<=outputSpikeSig;
 	
 end behave;
