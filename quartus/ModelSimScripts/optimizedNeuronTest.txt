@@ -1,0 +1,68 @@
+vsim rtl_work.neuron
+add wave -position end  sim:/neuron/clk
+add wave -position end  sim:/neuron/inputSpikes
+add wave -position end  sim:/neuron/spikeOutSig
+add wave -position end  sim:/neuron/weightedSpike
+add wave -position end  sim:/neuron/initW
+add wave -position end  sim:/neuron/globalRst
+add wave -position end  sim:/neuron/Nsyn
+add wave -position end  sim:/neuron/Iapp
+add wave -position end  sim:/neuron/outputSpike
+add wave -position end  sim:/neuron/D
+add wave -position end  sim:/neuron/somaIn
+add wave -position end  sim:/neuron/V
+add wave -position end  sim:/neuron/neuronActivity
+add wave -position end  sim:/neuron/v1
+add wave -position end  sim:/neuron/v2
+add wave -position end  sim:/neuron/SynapseGen_Loop(1)/Syn/Wsig
+add wave -position end  sim:/neuron/SynapseGen_Loop(2)/Syn/Wsig
+add wave -position end  sim:/neuron/SynapseGen_Loop(3)/Syn/Wsig
+add wave -position end  sim:/neuron/SynapseGen_Loop(4)/Syn/Wsig
+add wave -position end  sim:/neuron/SynapseGen_Loop(5)/Syn/Wsig
+force -freeze sim:/neuron/clk 1 0, 0 {50 ps} -r 100
+force -freeze sim:/neuron/globalRst 1 0
+force -freeze sim:/neuron/initW 0 0
+force -freeze sim:/neuron/inputSpikes 00000 0
+force -freeze sim:/neuron/Iapp 000000000000000 0
+run
+force -freeze sim:/neuron/globalRst 0 0
+force -freeze sim:/neuron/initW 1 0
+force -freeze sim:/neuron/inputSpikes 00000 0
+run
+force -freeze sim:/neuron/initW 0 0
+force -freeze sim:/neuron/inputSpikes 10000 0
+run
+force -freeze sim:/neuron/inputSpikes 01000 0
+run
+force -freeze sim:/neuron/inputSpikes 00010 0
+run
+force -freeze sim:/neuron/inputSpikes 00000 0
+run 4000
+
+# train the data for one spike pattern, and avoid other  pattern
+# Pattern 1
+force -freeze sim:/neuron/inputSpikes 10000 0
+run
+force -freeze sim:/neuron/inputSpikes 01000 0
+run
+force -freeze sim:/neuron/inputSpikes 00010 0
+run
+force -freeze sim:/neuron/inputSpikes 00000 0
+force -freeze sim:/neuron/Iapp 000001000000000 0
+ # +ve current
+run 1500
+# Pattern 2
+force -freeze sim:/neuron/inputSpikes 00100 0
+run
+force -freeze sim:/neuron/inputSpikes 10010 0
+run
+force -freeze sim:/neuron/inputSpikes 00001 0
+run
+force -freeze sim:/neuron/inputSpikes 00000 0
+force -freeze sim:/neuron/Iapp 111111000000000 0
+ # -ve current
+run 1500
+
+
+
+
