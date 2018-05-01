@@ -12,8 +12,8 @@ add wave -position end  sim:/neuron/D
 add wave -position end  sim:/neuron/somaIn
 add wave -position end  sim:/neuron/V
 add wave -position end  sim:/neuron/neuronActivity
-add wave -position end  sim:/neuron/v1
-add wave -position end  sim:/neuron/v2
+#add wave -position end  sim:/neuron/v1
+#add wave -position end  sim:/neuron/v2
 add wave -position end  sim:/neuron/SynapseGen_Loop(1)/Syn/Wsig
 add wave -position end  sim:/neuron/SynapseGen_Loop(2)/Syn/Wsig
 add wave -position end  sim:/neuron/SynapseGen_Loop(3)/Syn/Wsig
@@ -22,6 +22,15 @@ add wave -position end  sim:/neuron/SynapseGen_Loop(5)/Syn/Wsig
 force -freeze sim:/neuron/clk 1 0, 0 {50 ps} -r 100
 force -freeze sim:/neuron/globalRst 1 0
 force -freeze sim:/neuron/initW 0 0
+# initialize alpha's and beta's
+force -freeze sim:/neuron/beta1 000000001100110 0
+force -freeze sim:/neuron/beta2 000000001100110 0
+force -freeze sim:/neuron/betaA 111110000000000 0
+force -freeze sim:/neuron/alpha1 000001110011010 0
+force -freeze sim:/neuron/alpha2 0000010000000000
+force -freeze sim:/neuron/alphaV 000001011001101 0
+force -freeze sim:/neuron/alphaA 000001011001101 0
+#
 force -freeze sim:/neuron/inputSpikes 00000 0
 force -freeze sim:/neuron/Iapp 000000000000000 0
 run
@@ -48,7 +57,7 @@ run
 force -freeze sim:/neuron/inputSpikes 00010 0
 run
 force -freeze sim:/neuron/inputSpikes 00000 0
-force -freeze sim:/neuron/Iapp 000001000000000 0
+force -freeze sim:/neuron/Iapp 000011000000000 0
  # +ve current
 run 1500
 # Pattern 2
@@ -62,7 +71,3 @@ force -freeze sim:/neuron/inputSpikes 00000 0
 force -freeze sim:/neuron/Iapp 111111000000000 0
  # -ve current
 run 1500
-
-
-
-
