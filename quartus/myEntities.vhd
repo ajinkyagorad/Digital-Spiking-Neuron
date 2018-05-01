@@ -114,7 +114,6 @@ use work.all;
 use work.myTypes.all;
 
 entity VthComparator is
-generic(bits: natural:=8);
 port( V,Vth : in fp;
 		clk : in std_logic;
 		spike: out std_logic);
@@ -231,3 +230,80 @@ begin
 		vReg : register_fp_rst_1 port map(clk=>clk,dataIn=>vn,dataOut=>vsig,rst=>spike);
 		v<=vn;
 end arch;
+---------- no reset decay block (with inp
+
+library ieee;
+library ieee_proposed;
+
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
+use ieee_proposed.fixed_pkg.all;
+use work.all;
+use work.myTypes.all;
+
+entity decayBlockwithInput is 
+port (clk,rst : in std_logic;
+			alpha,input  : in fp;
+			v: out fp);
+end entity;
+architecture arch of decayBlockwithInput is 
+
+	component register_fp is 
+	port(clk: in std_logic;
+		rst: in std_logic;
+		dataIn : in fp;
+		dataOut : out fp);
+	end component;
+	
+	signal vsig,vn: fp:=to_sfixed(0,fp_int,fp_frac);
+	
+begin
+		
+		vn<=resize(resize(vsig*alpha,fp_int,fp_frac)+input,fp_int,fp_frac);
+		vReg : register_fp port map(clk=>clk,dataIn=>vn,dataOut=>vsig,rst=>rst);
+		v<=vn;
+end arch;
+
+----------------------------------------------
+
+-- nDelay FF : Synapse Component --
+library ieee;
+library ieee_proposed;
+
+--use model:
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee_proposed.math_utility_pkg.all;
+use ieee_proposed.fixed_pkg.all;
+use work.all;
+use work.myTypes.all;
+
+entity nDelayFF is
+	generic(n: integer :=2);
+	port(spike_in,clk : in std_logic;
+			spike_out : out std_logic);
+end entity nDelayFF;
+
+architecture behav of nDelayFF is
+
+	component DelayFF is
+	port(spike_in,clk : in std_logic;
+			spike_out : out std_logic);
+	end component;
+
+	signal spikeArrived : std_logic_vector(n downto 1):=(others=>'0');
+
+begin
+	
+	
+
+	D0 : DelayFF port map(clk=>clk,spike_in=>spike_in,spike_out=>spikeArrived(1));
+	DFF_genloop: for i in 2 to n generate 
+	D : DelayFF port map(clk=>clk,spike_in=>spikeArrived(i-1),spike_out=>spikeArrived(i));
+	end generate DFF_genloop;
+	spike_out <= spikeArrived(n);
+end behav;
+
+
+------------------------------------------------------------
