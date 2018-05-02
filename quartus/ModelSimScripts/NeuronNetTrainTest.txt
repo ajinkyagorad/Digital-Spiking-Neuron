@@ -5,14 +5,16 @@
     add wave -position end  sim:/neuronnet/pattern
     add wave -position end  sim:/neuronnet/out2
     add wave -position end  sim:/neuronnet/out1
-    add wave -position end  sim:/neuronnet/Iapp2
-    add wave -position end  sim:/neuronnet/Iapp1
-    add wave -position end  sim:/neuronnet/N1/SynapseGen_Loop(1)/Syn/Wn
-    add wave -position end  sim:/neuronnet/N1/SynapseGen_Loop(2)/Syn/Wn
-    add wave -position end  sim:/neuronnet/N1/SynapseGen_Loop(3)/Syn/Wn
-    add wave -position end  sim:/neuronnet/N2/SynapseGen_Loop(1)/Syn/Wn
-    add wave -position end  sim:/neuronnet/N2/SynapseGen_Loop(2)/Syn/Wn
-    add wave -position end  sim:/neuronnet/N2/SynapseGen_Loop(3)/Syn/Wn
+    # Model script graphic options added
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/Iapp2
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/Iapp1
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N1/SynapseGen_Loop(1)/Syn/Wn
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N1/SynapseGen_Loop(2)/Syn/Wn
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N1/SynapseGen_Loop(3)/Syn/Wn
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N2/SynapseGen_Loop(1)/Syn/Wn
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N2/SynapseGen_Loop(2)/Syn/Wn
+    add wave -format analog-step -radix sfixed -height  40 -max 3000 -min -1 -position end  sim:/neuronnet/N2/SynapseGen_Loop(3)/Syn/Wn
+
 
 
     force -freeze sim:/neuronnet/clk 1 0, 0 {50 ps} -r 100
