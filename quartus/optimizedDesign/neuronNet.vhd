@@ -16,12 +16,25 @@ end entity;
 architecture arch of neuronNet is
 
 component neuron is
-		generic( Nsyn : natural :=5;
-		D : integerArray:=(0,2,3,4,2,5));
-		port ( inputSpikes : in std_logic_vector(Nsyn downto 1);
-				 outputSpike : out std_logic;
-				 globalRst,clk,initW : in std_logic;
-				 Iapp : in fp);
+		-- neuron parameters
+		generic( Nsyn : natural :=3;
+		D : integerArray:=(2,3,4);
+		W : realArray:=(0.5, 0.2, 0.3);
+		alpha_w : real :=1.0;
+		beta_w : real :=0.98;
+		alpha_v1 :real :=0.98;
+		alpha_v2:real :=0.9333;
+		alpha_V :real :=0.98;
+		alpha_A:real :=0.98;
+		beta_1 :real :=0.0286;
+		beta_2 :real :=1.0;
+		beta_A :real :=1.0;
+		V_th :real :=1.0);
+		
+		port ( inputSpikes : in std_logic_vector(Nsyn downto 1):=(others=>'0');
+				 outputSpike : out std_logic:='0';
+				 globalRst,clk,initW : in std_logic:='0';
+				 Iapp : in fp:=to_sfixed(0,fp_int,fp_frac));
 end component;
 
 	signal pattern : std_logic_vector(3 downto 1):=(others=>'0');
