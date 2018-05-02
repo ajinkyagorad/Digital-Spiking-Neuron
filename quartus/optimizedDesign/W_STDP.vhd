@@ -12,8 +12,11 @@ use work.myTypes.all;
 use work.all;
 
 entity W_STDP is
+generic(beta_w : real :=1.0;
+			alpha_w : real:=0.98;
+			w_0 : real:=0.5);
 port(spikeSynapse, spikeNeuron, clk, initW : in std_logic;
-		w0,neuronActivity: in fp;
+		neuronActivity: in fp;
 		w: out fp);
 end entity W_STDP;
 
@@ -40,19 +43,19 @@ architecture behav of W_STDP is
 	end component;
 	
 	signal v3,v3n,av3,v4,v4n,av4,avn3,avn4,deltaW,Wn,Wsig : fp:=to_sfixed(0,fp_int,fp_frac);
-	signal alpha1 : fp :=to_sfixed(1,fp_int,fp_frac); -- sign of the weight change
-	signal alpha3 : fp :=to_sfixed(0.8,fp_int,fp_frac); --  1-dt/tauSTDP+
+	signal betaw : fp :=to_sfixed(beta_w,fp_int,fp_frac); -- sign of the weight change
+	signal alphaw : fp :=to_sfixed(alpha_w,fp_int,fp_frac); --  1-dt/tauSTDP+
 	signal ensig : std_logic;
-
+	signal w0:fp:=to_sfixed(w_0,fp_int,fp_frac);
 begin 
 
-	decay_blk_1: decayBlock port map(spike => spikeSynapse, alpha => alpha3, clk => clk, v => v3);
+	decay_blk_1: decayBlock port map(spike => spikeSynapse, alpha => alphaw, clk => clk, v => v3);
 
-	--alpha1<= to_sfixed(1,alpha1);
+	--betaw<= to_sfixed(1,betaw);
 	--alpha3<= to_sfixed(0.4, alpha3);
 
 	
-   deltaW <= resize(alpha1*v3,fp_int,fp_frac) when spikeNeuron = '1' else resize(neuronActivity,fp_int,fp_frac);
+   deltaW <= resize(betaw*v3,fp_int,fp_frac) when spikeNeuron = '1' else neuronActivity;
 	ensig <= (spikeNeuron xor spikeSynapse)or initW;
 	Wn <=resize(Wsig+deltaW,fp_int,fp_frac) when initW = '0' else w0;
 	WReg : register_fp_en  port map(clk=>clk, en => ensig, dataIn=>Wn,dataOut=>Wsig);
