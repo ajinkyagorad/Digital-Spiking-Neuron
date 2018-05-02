@@ -1,14 +1,3 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use ieee.numeric_std.all;
-
-library ieee_proposed;
-use ieee_proposed.fixed_pkg.all;
-use ieee_proposed.math_utility_pkg.all;
-
-library work;
-use work.myTypes.all;
-use work.all;
 
 -----------------------------
 library IEEE;
@@ -24,19 +13,35 @@ use work.myTypes.all;
 use work.all;
 
 entity neuron is
-		generic( Nsyn : natural :=5;
-		D : integerArray:=(0,2,3,4,2,5));
-		port ( inputSpikes : in std_logic_vector(Nsyn downto 1);
-				 outputSpike : out std_logic;
-				 globalRst,clk,initW : in std_logic;
-				 Iapp : in fp);
+		-- neuron parameters
+		generic( Nsyn : natural :=3;
+		D : integerArray:=(2,3,4);
+		W : realArray:=(0.5, 0.2, 0.3);
+		alpha_w : real :=1.0;
+		beta_w : real :=0.98;
+		alpha_v1 :real :=0.98;
+		alpha_v2:real :=0.9333;
+		alpha_V :real :=0.98;
+		alpha_A:real :=0.98;
+		beta_1 :real :=0.0286;
+		beta_2 :real :=1.0;
+		beta_A :real :=1.0;
+		V_th :real :=1.0);
+		
+		port ( inputSpikes : in std_logic_vector(Nsyn downto 1):=(others=>'0');
+				 outputSpike : out std_logic:='0';
+				 globalRst,clk,initW : in std_logic:='0';
+				 Iapp : in fp:=to_sfixed(0,fp_int,fp_frac));
 end entity;
 
 architecture behave of neuron is
 
 	component W_STDP is
+	generic(beta_w : real :=1.0;
+			alpha_w : real:=0.98;
+			w_0 : real:=0.5);
 	port(spikeSynapse, spikeNeuron, clk, initW : in std_logic;
-			w0,neuronActivity: in fp;
+			neuronActivity: in fp;
 			w: out fp);
 	end component W_STDP;
 
@@ -79,35 +84,34 @@ architecture behave of neuron is
 
 	
 	-- following should be in generics
-	signal 	W0   : fp_array(Nsyn downto 1):=(others=>to_sfixed(1,fp_int,fp_frac)); -- XXX : find wahy to give default value in array (type fp)
+	--signal 	W0   : fp_array(Nsyn downto 1):=(others=>to_sfixed(1,fp_int,fp_frac)); -- XXX : find wahy to give default value in array (type fp)
 		
-	signal	alpha1	: fp :=to_sfixed(0.9,fp_int,fp_frac);
-	signal	alpha2	: fp :=to_sfixed(0.4,fp_int,fp_frac);
-	signal	alphaV	: fp :=to_sfixed(0.7,fp_int,fp_frac);
-	signal	alphaA	: fp :=to_sfixed(0.8,fp_int,fp_frac);
-	signal	Vth : fp :=to_sfixed(1,fp_int,fp_frac);
+	signal	alpha1	: fp :=to_sfixed(alpha_v1,fp_int,fp_frac);
+	signal	alpha2	: fp :=to_sfixed(alpha_v2,fp_int,fp_frac);
+	signal	alphaV	: fp :=to_sfixed(alpha_V,fp_int,fp_frac);
+	signal	alphaA	: fp :=to_sfixed(alpha_A,fp_int,fp_frac);
+	signal	Vth : fp :=to_sfixed(V_th,fp_int,fp_frac);
 	--
-	signal beta1 		: fp :=to_sfixed(0.9,fp_int,fp_frac);
-	signal beta2		: fp :=to_sfixed(0.9,fp_int,fp_frac);
-	signal betaA 		: fp :=to_sfixed(-1.0,fp_int,fp_frac);
+	signal beta1 		: fp :=to_sfixed(beta_1,fp_int,fp_frac);
+	signal beta2		: fp :=to_sfixed(beta_2,fp_int,fp_frac);
+	signal betaA 		: fp :=to_sfixed(beta_A,fp_int,fp_frac);
 	
-	signal spikeOutSig, spikeOutSigDelayed, rstVsig : std_logic;
+	signal spikeOutSig, spikeOutSigDelayed, rstVsig : std_logic:='0';
 	--signal alpha1, alpha2, alphaV, alphaA,Vth :fp; -- Constants (could use from generic
 	signal v1, v2, vn1, PSP, V, somaIn ,neuronActivity, neuronActivityWeighted, weightedSpike: fp := to_sfixed(0.0,fp_int,fp_frac);
 	signal wSpike,sumWSpike : fp_array(1 to Nsyn):= (others=>to_sfixed(0,fp_int,fp_frac));
 	signal inputSpikesDelayed: std_logic_vector(Nsyn downto 1):=(others=>'0');
 
 begin
-
+		
+		
 	DelGen_Loop : for i in 1 to Nsyn generate
-		Del : nDelayFF generic map(n=>D(i)) port map (clk=>clk, spike_in=>inputSpikes(i), spike_out=>inputSpikesDelayed(i));
+		Del : nDelayFF generic map(n=>D(i-1)) port map (clk=>clk, spike_in=>inputSpikes(i), spike_out=>inputSpikesDelayed(i));
 	end generate DelGen_Loop;
 
 	SynapseGen_Loop : for i in 1 to Nsyn generate
-		Syn : W_STDP port map(spikeSynapse=> inputSpikesDelayed(i) ,
-		spikeNeuron => spikeOutSig,
-		clk=> clk,
-											initW=>initW, w0=> W0(i), neuronActivity=>neuronActivityWeighted, w=>wSpike(i));
+		Syn : W_STDP generic map(w_0=> W(i-1),beta_w=>beta_w, alpha_w=>alpha_w) port map(spikeSynapse=> inputSpikesDelayed(i) ,
+		spikeNeuron => spikeOutSig,clk=> clk,initW=>initW, neuronActivity=>neuronActivityWeighted, w=>wSpike(i));
 	end generate SynapseGen_Loop;
 	
 	-- Sum all spikes
