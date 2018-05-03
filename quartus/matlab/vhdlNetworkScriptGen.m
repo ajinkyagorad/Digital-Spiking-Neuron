@@ -1,15 +1,15 @@
 %% Write vhdl script given the network
 % Author : Ajinkya Gorad
 % Define Network properties
-X = [ 1 1 1 2 2 2 3 3 3]; % all are row vectors 1xNsyn matrices
-Xn = [2 3 4 1 3 4 1 2 4];
-Tau = [1 2 3 4 5 6 7 8 9];
-W = ([0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]);
+X = [ 1 1 1 2 2 2 3 3 3 4 4 5 5 5 5 7 8 9 5]; % all are row vectors 1xNsyn matrices
+Xn = [2 3 4 1 3 4 1 2 4 1 2 1 2 3 4 1 1 1 7 ];
+Tau = [1 2 3 4 5 6 7 8 9 4 5 2 1 4 5 2 4 5 1];
+W = ([0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]);
 
 inputNeurons = [1 2 3]; % add extra synapse to these neurons
 inputWeights = [1 1 1]; % and respective input weights for input
 inputDelays = [ 1 1 1]; % and respective delays for input
-outputNeurons = [4];
+outputNeurons = [1 2 3 4 5 6 7 8 9];
 %N=4;
 N = max([X Xn]); % total number of neurons in network
 Nsyn = length(X);
@@ -20,10 +20,10 @@ Ntotal = N+Ninput;
 % extra neurons are added as N+1 to N+Ninput, Ninput is the number of input
 % Neurons.
 if(Ninput>0)
-X = [X N+1:N+Ninput];
-Xn = [Xn inputNeurons];
-W = [W inputWeights];
-Tau = [Tau inputDelays];
+    X = [X N+1:N+Ninput];
+    Xn = [Xn inputNeurons];
+    W = [W inputWeights];
+    Tau = [Tau inputDelays];
 end
 % Neuron properties  in network
 alpha_w  = 1.0;
@@ -52,14 +52,14 @@ information ={'---------------------------------------------------------'
     'outputNeurons=[<outputNeurons>]'
     '---------------------------------------------------------'
     };
- s = sprintf('%i,' ,X); information = strrep(information,'<X>',s(1:end-1));
- s = sprintf('%i,' ,Xn); information = strrep(information,'<Xn>',s(1:end-1));
- s = sprintf('%i,' ,Tau); information = strrep(information,'<Tau>',s(1:end-1));
- s = sprintf('%.5f,' ,W); information = strrep(information,'<W>',s(1:end-1));
- s = sprintf('%i,' ,inputNeurons); information = strrep(information,'<inputNeurons>',s(1:end-1));
- s = sprintf('%.5f,' ,inputWeights); information = strrep(information,'<inputWeights>',s(1:end-1));
- s = sprintf('%i,' ,inputDelays); information = strrep(information,'<inputDelays>',s(1:end-1));
- s = sprintf('%i,' ,outputNeurons); information = strrep(information,'<outputNeurons>',s(1:end-1));
+s = sprintf('%i,' ,X); information = strrep(information,'<X>',s(1:end-1));
+s = sprintf('%i,' ,Xn); information = strrep(information,'<Xn>',s(1:end-1));
+s = sprintf('%i,' ,Tau); information = strrep(information,'<Tau>',s(1:end-1));
+s = sprintf('%.5f,' ,W); information = strrep(information,'<W>',s(1:end-1));
+s = sprintf('%i,' ,inputNeurons); information = strrep(information,'<inputNeurons>',s(1:end-1));
+s = sprintf('%.5f,' ,inputWeights); information = strrep(information,'<inputWeights>',s(1:end-1));
+s = sprintf('%i,' ,inputDelays); information = strrep(information,'<inputDelays>',s(1:end-1));
+s = sprintf('%i,' ,outputNeurons); information = strrep(information,'<outputNeurons>',s(1:end-1));
 
 for i =1:length(information)
     fprintf(fID,'--%s\r\n',information{i});
@@ -162,12 +162,15 @@ end
 fprintf(fID,'\r\n\r\n   --Define interconnection delays for each neuron \r\n');% print comment
 strD ={'   constant D<n> :integerArray :=(<val>);' };
 for n =1:N
-    strDeval =strD;
-    strDeval = strrep(strDeval,'<n>',num2str(n));
-    s = sprintf('%.0f,' , Tau(Xn==n));
-    strDeval = strrep(strDeval,'<val>',s(1:end-1));
-    for i =1:length(strDeval)
-        fprintf(fID,'%s\r\n',strDeval{i});
+    numSyn = sum(Xn==n);
+    if(numSyn>0)
+        strDeval =strD;
+        strDeval = strrep(strDeval,'<n>',num2str(n));
+        s = sprintf('%.0f,' , Tau(Xn==n));
+        strDeval = strrep(strDeval,'<val>',s(1:end-1));
+        for i =1:length(strDeval)
+            fprintf(fID,'%s\r\n',strDeval{i});
+        end
     end
 end
 % for eg : "constant W23 : realArray:=(3.0,5.0,2.0,1.0);" for neuron 23
@@ -175,12 +178,15 @@ end
 fprintf(fID,'\r\n\r\n   --Define initial Weights for each neuron\r\n');% print comment
 strW ={'   constant W<n> :realArray :=(<val>);' };
 for n =1:N
-    strWeval =strW;
-    strWeval = strrep(strWeval,'<n>',num2str(n));
-    s = sprintf('%.5f,' , W(Xn==n));
-    strWeval = strrep(strWeval,'<val>',s(1:end-1));
-    for i =1:length(strWeval)
-        fprintf(fID,'%s\r\n',strWeval{i});
+    numSyn = sum(Xn==n);
+    if(numSyn>0)
+        strWeval =strW;
+        strWeval = strrep(strWeval,'<n>',num2str(n));
+        s = sprintf('%.5f,' , W(Xn==n));
+        strWeval = strrep(strWeval,'<val>',s(1:end-1));
+        for i =1:length(strWeval)
+            fprintf(fID,'%s\r\n',strWeval{i});
+        end
     end
 end
 %% for synapse spike signals (input to each neuron)
@@ -217,7 +223,7 @@ end
 % Create entities of neuron
 fprintf(fID,'\r\n\r\n   --Generate Neurons\r\n');% print comment
 strN = {'	N<n> :  neuron generic map(Nsyn=><Nsyn>,D=>D<n>,W=>W<n>,alpha_V=>alpha_V,alpha_v1=>alpha_v1,alpha_v2=>alpha_v2,alpha_A=>alpha_A,alpha_w=>alpha_w,beta_1=>beta_1,beta_2=>beta_2,beta_A=>beta_A,beta_w=>beta_w)' ...
-        '           port map(Iapp=>Iapp(<n>),inputSpikes=>synapseSpike<n>,outputSpike=>neuronSpike(<n>),globalRst=>globalRst,clk=>clk);'};
+    '           port map(Iapp=>Iapp(<n>),inputSpikes=>synapseSpike<n>,outputSpike=>neuronSpike(<n>),globalRst=>globalRst,clk=>clk);'};
 
 for n =1:Ntotal
     strNeval =strN;
@@ -275,9 +281,8 @@ for n = 1:Noutput
 end
 %%
 architecture3={
-    
-'end arch;'
-};
+    'end arch;'
+    };
 architecture3 = strrep(architecture3,'<entityName>',entityName);
 
 for i =1:length(architecture3)
