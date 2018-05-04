@@ -1,15 +1,23 @@
 %% Write vhdl script given the network
 % Author : Ajinkya Gorad
 % Define Network properties
-X = [ 1 1 1 2 2 2 3 3 3 4 4 5 5 5 5 7 8 9 5]; % all are row vectors 1xNsyn matrices
-Xn = [2 3 4 1 3 4 1 2 4 1 2 1 2 3 4 1 1 1 7 ];
-Tau = [1 2 3 4 5 6 7 8 9 4 5 2 1 4 5 2 4 5 1];
-W = ([0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]);
+% X = [ 1 1 1 2 2 2 3 3 3 4 4 5 5 5 5 7 8 9 5]; % all are row vectors 1xNsyn matrices
+% Xn = [2 3 4 1 3 4 1 2 4 1 2 1 2 3 4 1 1 1 7 ];
+% Tau = [1 2 3 4 5 6 7 8 9 4 5 2 1 4 5 2 4 5 1];
+% W = ([0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1]);
+%X = [1 1 1 1 2 2 2 2 3 3 3 3 4 4 5 5 6 6 7 7];
+%Xn = [4 5 6 7 4 5 6 7 4 5 6 7 8 9 8 9 8 9 8 9];
+%Tau = [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1];
+%W = rand(size(X));
+X = [1 2 3 1 2 3];
+Xn = [1 1 2 2 3 3];
+W = [ 1 1 1 1 1 1];
+Tau = [2 2 2 2 2 2];
 
 inputNeurons = [1 2 3]; % add extra synapse to these neurons
 inputWeights = [1 1 1]; % and respective input weights for input
-inputDelays = [ 1 1 1]; % and respective delays for input
-outputNeurons = [1 2 3 4 5 6 7 8 9];
+inputDelays = [1 1 1]; % and respective delays for input
+outputNeurons = [1 2 3]; % must be from the existing neurons
 %N=4;
 N = max([X Xn]); % total number of neurons in network
 Nsyn = length(X);
@@ -84,9 +92,9 @@ end
 fprintf(fID,'\r\n\r\n');
 %% Write entity information
 entity = {'entity <entityName> is'
-    'port (clk,globalRst : in std_logic;'
-    '        spikeIn: in std_logic_vector(<inputNeurons> downto 1);'
-    '        spikeOut: out std_logic_vector(<outputNeurons> downto 1));'
+    'port (clk,globalRst : in std_logic:=''0'';'
+    '        spikeIn: in std_logic_vector(<inputNeurons> downto 1):=(others=>''0'');'
+    '        spikeOut: out std_logic_vector(<outputNeurons> downto 1):=(others=>''0''));'
     'end entity;'
     ''
     };
