@@ -1,0 +1,24 @@
+vsim rtl_work.network
+
+add wave -position end  sim:/network/Iapp
+add wave -position end  sim:/network/spikeOut
+add wave -position end  sim:/network/spikeIn
+add wave -position end  sim:/network/globalRst
+add wave -position end  sim:/network/clk
+add wave -position end  sim:/network/N1/V
+add wave -position end  sim:/network/N2/V
+add wave -position end  sim:/network/N3/V
+add wave -position end  sim:/network/N1/regV/dataOut
+add wave -position end  sim:/network/N1/regV/dataIn
+force -freeze sim:/network/spikeIn 000 0
+force -freeze sim:/network/globalRst 0 0
+force -freeze sim:/network/globalRst 1 0
+force -freeze sim:/network/clk 1 0, 0 {50 ps} -r 100
+run
+force -freeze sim:/network/globalRst 0 0
+run
+run
+run
+run
+run
+run 10000
